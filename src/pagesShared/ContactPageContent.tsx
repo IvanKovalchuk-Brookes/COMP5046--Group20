@@ -11,11 +11,54 @@ export function ContactPageContent() {
     email: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{
+    type: 'success' | 'error' | null;
+    text: string;
+  }>({ type: null, text: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Form submitted! (UI only - no backend)');
-    setFormData({ name: '', email: '', message: '' });
+    setStatusMessage({ type: null, text: '' });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const contentType = response.headers.get('content-type') ?? '';
+      let apiMessage = '';
+
+      if (contentType.includes('application/json')) {
+        const data = (await response.json()) as { message?: string };
+        apiMessage = data.message ?? '';
+      } else {
+        const text = await response.text();
+        apiMessage = text.slice(0, 200).trim();
+      }
+
+      if (!response.ok) {
+        throw new Error(apiMessage || 'Unable to send your message right now.');
+      }
+
+      setStatusMessage({
+        type: 'success',
+        text:
+          apiMessage ||
+          'Thanks, your message was sent successfully. We will get back to you shortly.',
+      });
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong while sending your message.';
+      setStatusMessage({ type: 'error', text: message });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,11 +144,23 @@ export function ContactPageContent() {
 
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all flex items-center justify-center space-x-2 group"
+                  disabled={isSubmitting}
+                  className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all flex items-center justify-center space-x-2 group disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <span>Send Message</span>
+                  <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
                   <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
+                {statusMessage.type && (
+                  <p
+                    className={`text-sm ${
+                      statusMessage.type === 'success'
+                        ? 'text-emerald-400'
+                        : 'text-destructive'
+                    }`}
+                  >
+                    {statusMessage.text}
+                  </p>
+                )}
               </div>
             </form>
           </div>
@@ -136,6 +191,8 @@ export function ContactPageContent() {
                       '@',
                       '',
                     )}`}
+                    target="_blank"
+                    rel="noreferrer"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     {CONTACT_INFO.twitter}
@@ -147,6 +204,8 @@ export function ContactPageContent() {
                       '@',
                       '',
                     )}`}
+                    target="_blank"
+                    rel="noreferrer"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     {CONTACT_INFO.instagram}

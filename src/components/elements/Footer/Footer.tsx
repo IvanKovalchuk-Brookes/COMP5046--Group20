@@ -69,12 +69,22 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href={`https://twitter.com/${CONTACT_INFO.twitter.replace('@', '')}`} className="hover:text-primary transition-colors">
+                <a
+                  href={`https://twitter.com/${CONTACT_INFO.twitter.replace('@', '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   {CONTACT_INFO.twitter}
                 </a>
               </li>
               <li>
-                <a href={`https://instagram.com/${CONTACT_INFO.instagram.replace('@', '')}`} className="hover:text-primary transition-colors">
+                <a
+                  href={`https://instagram.com/${CONTACT_INFO.instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   {CONTACT_INFO.instagram}
                 </a>
               </li>
