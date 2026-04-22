@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/containers/Layout/AppLayout';
 import { formatGbp } from '@/lib/format-currency';
 import { useSubscriptionsQuery } from '@/hooks/useSubscriptionsQuery';
 import { Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AnalyticsPage() {
   const { subscriptions: subs, loading, error, refetch } = useSubscriptionsQuery();
@@ -55,9 +56,9 @@ export default function AnalyticsPage() {
         {!loading && !error && subs.length === 0 && (
           <p className="text-muted-foreground">
             Add subscriptions to see spend by category.{' '}
-            <a href="/app/subscriptions" className="text-primary hover:underline">
+            <Link href="/app/subscriptions/" className="text-primary hover:underline">
               Go to Subscriptions
-            </a>
+            </Link>
           </p>
         )}
 
